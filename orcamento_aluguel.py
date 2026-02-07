@@ -28,23 +28,26 @@ class Imovel:
         return acrescimo_total
 ############################################################################################################
 
+# Aplica desconto de 5% para apartamento sem crianças.
 def aplica_desconto(self, tem_criancas):
     if self.tipo == "apartamento" and not tem_criancas:
-        desconto = self.valor_final * 0.05
-        self.valor_final -= desconto
-        self.desconto_aplicado = True
+        desconto = self.valor_final * 0.05                # Calcula 5% de desconto
+        self.valor_final -= desconto                      # Subtrai o desconto
+        self.desconto_aplicado = True                     # Marca que o desconto foi aplicado
         return desconto
     return 0
 ############################################################################################################
 
+# Calcula o valor final do aluguel com todos os ajustes.
 def calcular_valor_final(self, tem_criancas=False):
-    self.calcular_valor_base()
-    acrescimos = self.calcular_acrescimos()
-    self.valor_final = self.valor_base + acrescimos
-    self.aplicar_desconto(tem_criancas)
+    self.calcular_valor_base()                           # Calcula valor base
+    acrescimos = self.calcular_acrescimos()              # Calcula acréscimos
+    self.valor_final = self.valor_base + acrescimos      # Soma base = acréscimos
+    self.aplicar_desconto(tem_criancas)                  # Aplica desconto se aplicável
     return self.valor_final
 ############################################################################################################
 
+# Exibe na tela o orçamento formatado
 def exibir_orcamento(self):
     print("\n" + "="*100)
     print(" "*30 + "ORÇAMENTO DE ALUGUEL - IMOBILIÁRIA R.M")
