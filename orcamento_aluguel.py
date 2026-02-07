@@ -47,7 +47,7 @@ def calcular_valor_final(self, tem_criancas=False):
     return self.valor_final
 ############################################################################################################
 
-# Exibe na tela o orçamento formatado
+# Exibe na tela o orçamento formatado.
 def exibir_orcamento(self):
     print("\n" + "="*100)
     print(" "*30 + "ORÇAMENTO DE ALUGUEL - IMOBILIÁRIA R.M")
@@ -61,6 +61,50 @@ def exibir_orcamento(self):
         print("Desconto aplicado: 5% (sem crianças)")
     print("\n" + "="*100)
 ############################################################################################################
+
+# Classe para apartamento.
+class Apartamento(Imovel):
+    def __init__(self, quartos=1, garagem=False):
+        super().__init__("apartamento", quartos, garagem)     # Chama o construtor da classe
+    def calcular_valor_base(self):
+        self.valor_base = 700.00                              # Valor base para apartamento
+############################################################################################################
+
+# Classe para casa.
+class Casa(Imovel):
+    def __init__(self, quartos=1, garagem=False):
+        super().__init__("casa", quartos, garagem)            # Chama o construtor da classe
+    def calcular_valor_base(self):
+        self.valor_base = 900.00                              # Valor base para casa
+############################################################################################################
+
+# Classe para estúdio.
+class Estudio(Imovel):
+    def __init__(self, vagas_estacionamento=0):
+        super().__init__("estúdio", quartos=0)                # Estúdio não possui quartos
+        self.vagas_estacionamento = vagas_estacionamento      # Vagas de estacionamento
+        self.garagem = False                                  # Não possui garagem
+    def calcular_valor_base(self):
+        self.valor_base = 1200.00                             # Valor base estúdio
+    def calcular_acrescimos(self):
+        acrescimo_total = 0
+# Lógica específica para estacionamento de estúdio.
+        if self.vagas_estacionamento > 0:
+            if self.vagas_estacionamento <= 2:                # Até 2 vagas: R$250,00 valor fixo
+                acrescimo_total += 250
+            else:                                             # Primeiras 2 vagas + R$ 250,00
+                acrescimo_total += 250
+# Vagas adicionais: R$ 60,00 cada
+                vagas_extras = self.vagas_estacionamento - 2
+                acrescimo_total += vagas_extras * 60
+        return acrescimo_total
+# Sobrescreve o método de exibição para incluir vagas de estacionamento.
+    def exibir_orcamento(self):
+        super().exibir_orcamento()                           # Chama método da classe
+        if self.vagas_estacionamento > 0:
+            print(f"Vagas de estacionamento: {self.vagas_estacionamento}")
+############################################################################################################
+
 
 
 
