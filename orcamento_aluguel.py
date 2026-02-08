@@ -136,6 +136,90 @@ class OrcamentoCompleto:
         print(" "*30 + "PROJEÇÃO DE 12 MESES DE ALUGUEL")
         print("-"*100 + "\n")
         print(f"Total em 12 meses: R$ {total_12_meses:.2f}")
+        print(f"Média mensal: R$ {self.valor_mensal:.2f}")
 
+# Gera um arquivo CSV com a projeção de 12 meses.
+    def gerar_csv_12_meses(self, nome_arquivo="orcamento_12_meses.csv"):
+        try:
+            dados = []
+            for mes in range(1, 13):
+                dados.append({
+                    'Mes': f'Mês {mes}',
+                    'Valor_Aluguel': self.valor_mensal,
+                    'Descricao': f'Aluguel {self.imovel.tipo} - Mês {mes}'
+                })
+
+# Escreve no CSV.
+            with open(nome_arquivo, 'w', newline='', encoding= 'utf-8') as arquivo:
+                campos = ['Mes', 'Valor_aluguel', 'Descricao']
+                escritor = csv.DicWriter(arquivo, fieldnames=campos)
+                escritor.writeheader()
+                escritor.writerows(dados)
+            print(f"\nArquivo CSV gerado com sucesso: {nome_arquivo}")
+            return nome_arquivo
+        except Exception as e:
+            print(f"\nErro ao gerar arquivo CSV: {e}")
+            return None
+########################################################################################################################
+
+# Função: Menu Principal
+def menu_principal():
+    print("\n" + "-"*100)
+    print(" "*30 + "SISTEMA DE ORÇAMENTO - IMOBILIÁRIA R.M")
+    print("-"*100 + "\n")
+    while True:
+        print(" "*30 + "MENU PRINCIPAL:")
+        print("1. Criar orçamento para Apartamento")
+        print("2. Criar orçamento para Casa")
+        print("3. Criar orçamento para Estúdio")
+        print("4. Sair")
+        try:
+            opcao = int(input("\nEscolha uma opção: "))
+            if opcao == 1:
+                criar_orcamento_apartamento()
+            elif opcao == 2:
+                criar_orcamento_casa()
+            elif opcao == 3:
+                criar_orcamento_estudio()
+            elif opcao == 4:
+                print("\nObrigado por usar o sistema da Imobiliária R.M")
+                print("Encerrando programa...")
+                break
+            else:
+                print("\nOpção inválida! Escolha entre 1 e 4.")
+        except ValueError:
+            print("\nEntrada inválida! Digite um número.")
+#######################################################################################################################
+
+# Cria um orçamento específico para apartamento.
+def criar_orcamento_apartamento():
+    print("\n" + "-"*100)
+    print(" "*30 + "ORÇAMENTO PARA APARTAMENTO")
+    print("-"*100 + "\n")
+    try:
+# Solicita dados do apartamento.
+        quartos = int(input("Quatidade de quartos: ") or "1")
+        garagem = input("Incluir vaga de garagem? (S/N): ").upper() == "S"
+        tem_criancas = input("Possui crianças? (S/N): ").upper() == "S"
+# Solicita Parcalamento do contrato.        
+        parcelas = int(input("Número de parcelas para o contrato (1-5, padrão: 1): ") or "1")
+        parcelas = min(max(1, parcelas), 5)                                 # Garante entre 1-5
+# Cria objeto do apartamento.
+        apartamento = Apartamento(quartos=quartos, garagem=garagem)
+# Cria orçamento completo.
+        orcamento = OrcamentoCompleto(
+            imovel=apartamento,
+            tem_criancas=tem_criancas,
+            parcelas_contrato=parcelas
+        )
+# Exibe resumo.
+        orcamento.exibir_resumo()
+# Oferece opção de gerar CSV.
+        gerar_csv = input("\nDeseja gerar arquivo CSV com projeção de 12 meses? (S/N): ").upper() == "S"
+        if gerar_csv:
+            orcamento.gerar_csv_12_meses()
+    except ValueError:
+        print("\nErro: Por favor, insira valores numéricos válidos.")
+######################################################################################################################
 
 
