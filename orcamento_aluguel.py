@@ -312,3 +312,31 @@ def exemplos_uso():
     print("\nGerando arquivo CSV para o Exemplo 1...")
     orc1.gerar_csv_12_meses("exemplo_apartamento.csv")
 ##########################################################################################################
+
+# Função Principal que inicia o sistema.
+def main():
+    print("\n" + "-"*100)
+    print(" "*30 + "Bem - vindo ao Sistema de Orçamento da Imobiliária R.M!")
+    print("Este sistema gera orçamento mensais de aluguel.")
+    print("-"*100 + "\n")
+    while True:
+        print("\n" + "*"*100)
+        print(" "*30 + "OPÇÕES:")
+        print("*"*100 + "\n")
+        print("1. Usar Sistema interativo")
+        print("2. Ver exemplos de uso")
+        print("3. Sair")
+        try:
+            escolha = int(input("\nEscolha uma opção (1-3): "))
+            if escolha == 1:
+                menu_principal()
+            elif escolha == 2:
+                exemplos_uso()
+            elif escolha == 3:
+                print("\nObrigado por usar nosso sistema!")
+                break
+            else:
+                print("\nOpção inválida!")
+        except ValueError:
+            print("\nEntrada inválida! Digite um número.")
+#########################################################################################################
