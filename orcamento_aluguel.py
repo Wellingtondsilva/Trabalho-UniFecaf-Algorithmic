@@ -1,3 +1,10 @@
+import os
+
+def limpar_tela():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+import csv
+
 # Classe que representa um imóvel, contém atributos e métodos comuns a todos os tipos de imóveis.
 class Imovel:
     def __init__(self, tipo, quartos=1, garagem=False):
@@ -39,7 +46,7 @@ class Imovel:
         self.calcular_valor_base()                           # Calcula valor base
         acrescimos = self.calcular_acrescimos()              # Calcula acréscimos
         self.valor_final = self.valor_base + acrescimos      # Soma base = acréscimos
-        self.aplicar_desconto(tem_criancas)                  # Aplica desconto se aplicável
+        self.aplica_desconto(tem_criancas)                  # Aplica desconto se aplicável
         return self.valor_final
 
 # Exibe na tela o orçamento formatado.
@@ -49,7 +56,7 @@ class Imovel:
         print("\n" + "="*100)
         print(f"Tipo do imóvel: {self.tipo.upper()}")
         print(f"Quantidade de quartos: {self.quartos}")
-        print(f"Vaga de garagem: {'SIM' if self.garagem else 'NÂO'}")
+        print(f"Vaga de garagem: {'SIM' if self.garagem else 'NÃO'}")
         print(f"Valor base do aluguel: R$ {self.valor_base:.2f}")
         print(f"Valor final mensal: R$ {self.valor_final:.2f}")
         if self.desconto_aplicado:
@@ -151,8 +158,8 @@ class OrcamentoCompleto:
 
 # Escreve no CSV.
             with open(nome_arquivo, 'w', newline='', encoding= 'utf-8') as arquivo:
-                campos = ['Mes', 'Valor_aluguel', 'Descricao']
-                escritor = csv.DicWriter(arquivo, fieldnames=campos)
+                campos = ['Mes', 'Valor_Aluguel', 'Descricao']
+                escritor = csv.DictWriter(arquivo, fieldnames=campos)
                 escritor.writeheader()
                 escritor.writerows(dados)
             print(f"\nArquivo CSV gerado com sucesso: {nome_arquivo}")
@@ -175,6 +182,7 @@ def menu_principal():
         print("4. Sair")
         try:
             opcao = int(input("\nEscolha uma opção: "))
+            limpar_tela()
             if opcao == 1:
                 criar_orcamento_apartamento()
             elif opcao == 2:
@@ -213,7 +221,7 @@ def criar_orcamento_apartamento():
             parcelas_contrato=parcelas
         )
 # Exibe resumo.
-        orcamento.exibir_resumo()
+        orcamento.exibir_orcamento()
 # Oferece opção de gerar CSV.
         gerar_csv = input("\nDeseja gerar arquivo CSV com projeção de 12 meses? (S/N): ").upper() == "S"
         if gerar_csv:
@@ -244,9 +252,9 @@ def criar_orcamento_casa():
             parcelas_contrato=parcelas
         )
 # Exibe resumo
-        orcamento.exibir_resumo()
+        orcamento.exibir_orcamento()
 # Oferece opção de gerar CSV
-        gera_csv = input("\nDeseja gerar arquivo CSV com projeção de 12 meses? (S/N): ").upper == "S"
+        gera_csv = input("\nDeseja gerar arquivo CSV com projeção de 12 meses? (S/N): ").upper() == "S"
         if gera_csv:
             orcamento.gerar_csv_12_meses()
     except ValueError:
@@ -276,9 +284,9 @@ def criar_orcamento_estudio():
             parcelas_contrato=parcelas
         )
 # Exibe resumo
-        orcamento.exibir_resumo()
+        orcamento.exibir_orcamento()
 # Oferece opção de gerar CSV
-        gera_csv = input("\nDeseja gerar arquivo CSV com projeção de 12 meses? (S/N): ").upper == "S"
+        gera_csv = input("\nDeseja gerar arquivo CSV com projeção de 12 meses? (S/N): ").upper() == "S"
         if gera_csv:
             orcamento.gerar_csv_12_meses()
     except ValueError:
@@ -294,19 +302,19 @@ def exemplos_uso():
     print("\nEXEMPLO 1: Apartamento básico (1 quarto, sem garagem)")
     apt1 = Apartamento(quartos=1, garagem=False)
     orc1 = OrcamentoCompleto(apt1, tem_criancas=False, parcelas_contrato=3)
-    orc1.exibir_resumo()
+    orc1.exibir_orcamento()
 # Exemplo 2: Casa com extras
     print("-"*100 + "\n")
     print("\nEXEMPLO 2: Casa com 3 quartos e garagem")
     casa1 = Casa(quartos=3, garagem=True)
     orc2 = OrcamentoCompleto(casa1, tem_criancas=True, parcelas_contrato=5)
-    orc2.exibir_resumo()
+    orc2.exibir_orcamento()
 # Exemplo 3: Estúdio com estacionamento
     print("-"*100 + "\n")
     print("\nEXEMPLO 3: Estúdio com 4 vagas de estacionamento")
     est1 = Estudio(vagas_estacionamento=4)
     orc3 = OrcamentoCompleto(est1, parcelas_contrato=2)
-    orc3.exibir_resumo()
+    orc3.exibir_orcamento()
 # Gera CSV para um dos exemplos
     print("-"*100 + "\n")
     print("\nGerando arquivo CSV para o Exemplo 1...")
@@ -316,12 +324,12 @@ def exemplos_uso():
 # Função Principal que inicia o sistema.
 def main():
     print("\n" + "-"*100)
-    print(" "*30 + "Bem - vindo ao Sistema de Orçamento da Imobiliária R.M!")
-    print("Este sistema gera orçamento mensais de aluguel.")
+    print(" "*20 + "Bem - vindo ao Sistema de Orçamento da Imobiliária R.M!")
+    print(" "*23 + "Este sistema gera orçamento mensais de aluguel.")
     print("-"*100 + "\n")
     while True:
         print("\n" + "*"*100)
-        print(" "*30 + "OPÇÕES:")
+        print(" "*40 + "OPÇÕES:")
         print("*"*100 + "\n")
         print("1. Usar Sistema interativo")
         print("2. Ver exemplos de uso")
@@ -340,3 +348,7 @@ def main():
         except ValueError:
             print("\nEntrada inválida! Digite um número.")
 #########################################################################################################
+
+# Execução do programa.
+if __name__ == "__main__":
+    main()
