@@ -222,4 +222,93 @@ def criar_orcamento_apartamento():
         print("\nErro: Por favor, insira valores numéricos válidos.")
 ######################################################################################################################
 
+# Função cria orçamento específico para casa.
+def criar_orcamento_casa():
+    print("\n" + "-"*100)
+    print(" "*30 + "ORÇAMENTO PARA CASA")
+    print("-"*100 + "\n")
+    try:
+# Solicita dados para casa
+        quartos = int(input("Quatidade de quartos: ") or "1")
+        garagem = input("Incluir vaga de garagem? (S/N): ").upper() == "S"
+        tem_criancas = input("Possui crianças? (S/N): ").upper() == "S"
+# Solicita Parcalamento do contrato.        
+        parcelas = int(input("Número de parcelas para o contrato (1-5, padrão: 1): ") or "1")
+        parcelas = min(max(1, parcelas), 5)                                 # Garante entre 1-5
+# Cria objeto casa
+        casa = Casa(quartos=quartos, garagem=garagem)
+# Cria orçamento completo
+        orcamento = OrcamentoCompleto(
+            imovel=casa,
+            tem_criancas=tem_criancas,
+            parcelas_contrato=parcelas
+        )
+# Exibe resumo
+        orcamento.exibir_resumo()
+# Oferece opção de gerar CSV
+        gera_csv = input("\nDeseja gerar arquivo CSV com projeção de 12 meses? (S/N): ").upper == "S"
+        if gera_csv:
+            orcamento.gerar_csv_12_meses()
+    except ValueError:
+        print("\nErro: Por favor, insira valores numéricos válidos.")
+#########################################################################################################################
 
+# Cria um orçamento específico para estúdio.
+def criar_orcamento_estudio():
+    print("\n" + "-"*100)
+    print(" "*30 + "ORÇAMENTO PARA ESTÚDIO")
+    print("-"*100 + "\n")
+    try:
+# Solicita dados do estúdio
+        vagas = int(input("Quantidade de vagas de estacionamento (0-10, padrão: 0): ") or "0")
+        vagas = min(max(0, vagas), 10)                          # Garante entre 0 e 10
+# Estúdio não tem desconto por crianças
+        tem_criancas = False
+# Solicita parcelamento do contrato
+        parcelas = int(input("Número de parcelas para o contrato (1-5, padrão: 1): ") or "1")
+        parcelas = min(max(1, parcelas), 5)                      # Garante entre 1-5
+# Cria objeto estúdio
+        estudio = Estudio(vagas_estacionamento=vagas)
+# Cria orçamento completo
+        orcamento = OrcamentoCompleto(
+            imovel=estudio,
+            tem_criancas=tem_criancas,
+            parcelas_contrato=parcelas
+        )
+# Exibe resumo
+        orcamento.exibir_resumo()
+# Oferece opção de gerar CSV
+        gera_csv = input("\nDeseja gerar arquivo CSV com projeção de 12 meses? (S/N): ").upper == "S"
+        if gera_csv:
+            orcamento.gerar_csv_12_meses()
+    except ValueError:
+        print("\nErro: Por favor, insira valores numéricos válidos.")
+########################################################################################################################################
+
+# Função com exemplos de uso para testes.
+def exemplos_uso():
+    print("\n" + "-"*100)
+    print(" "*30 + "EXEMPLOS DE USO DO SISTEMA")
+    print("-"*100 + "\n")
+# Exemplo 1: Apartamento básico
+    print("\nEXEMPLO 1: Apartamento básico (1 quarto, sem garagem)")
+    apt1 = Apartamento(quartos=1, garagem=False)
+    orc1 = OrcamentoCompleto(apt1, tem_criancas=False, parcelas_contrato=3)
+    orc1.exibir_resumo()
+# Exemplo 2: Casa com extras
+    print("-"*100 + "\n")
+    print("\nEXEMPLO 2: Casa com 3 quartos e garagem")
+    casa1 = Casa(quartos=3, garagem=True)
+    orc2 = OrcamentoCompleto(casa1, tem_criancas=True, parcelas_contrato=5)
+    orc2.exibir_resumo()
+# Exemplo 3: Estúdio com estacionamento
+    print("-"*100 + "\n")
+    print("\nEXEMPLO 3: Estúdio com 4 vagas de estacionamento")
+    est1 = Estudio(vagas_estacionamento=4)
+    orc3 = OrcamentoCompleto(est1, parcelas_contrato=2)
+    orc3.exibir_resumo()
+# Gera CSV para um dos exemplos
+    print("-"*100 + "\n")
+    print("\nGerando arquivo CSV para o Exemplo 1...")
+    orc1.gerar_csv_12_meses("exemplo_apartamento.csv")
+##########################################################################################################
