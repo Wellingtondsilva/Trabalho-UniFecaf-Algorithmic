@@ -1,9 +1,8 @@
 import os
+import csv
 
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
-
-import csv
 
 # Classe que representa um imóvel, contém atributos e métodos comuns a todos os tipos de imóveis.
 class Imovel:
@@ -94,15 +93,10 @@ class Estudio(Imovel):
         
     def calcular_acrescimos(self):
         acrescimo_total = 0
-# Lógica específica para estacionamento de estúdio.
         if self.vagas_estacionamento > 0:
-            if self.vagas_estacionamento <= 2:                # Até 2 vagas: R$250,00 valor fixo
-                acrescimo_total += 250
-            else:                                             # Primeiras 2 vagas + R$ 250,00
-                acrescimo_total += 250
-# Vagas adicionais: R$ 60,00 cada
-                vagas_extras = self.vagas_estacionamento - 2
-                acrescimo_total += vagas_extras * 60
+            acrescimo_total += 250                            # 1 ou 2 vagas: R$250,00
+            if self.vagas_estacionamento > 2:
+                acrescimo_total += (self.vagas_estacionamento - 2) * 60  # R$60 por vaga extra
         return acrescimo_total
     
 # Sobrescreve o método de exibição para incluir vagas de estacionamento.
@@ -126,42 +120,39 @@ class OrcamentoCompleto:
 # Calcula todos os valores do orçamento.
     def calcular_orcamento(self):
         self.valor_mensal = self.imovel.calcular_valor_final(self.tem_criancas)        # Calcula valor mensal do aluguel
-        self.valor_parcelas_contrato = self.valor_contrato / self.parcelas_contrato    # Calcula valor da parcela do contrato
+        self.valor_parcelas_contrato = round(self.valor_contrato / self.parcelas_contrato, 2)  # ✅ ARREDONDADO
 
 # Exibe um resumo completo do orçamento.
     def exibir_orcamento(self):
         self.imovel.exibir_orcamento()                                                 # Exibe orçamento do imóvel
-        total_12_meses = self.valor_mensal * 12
+        total_12_meses_aluguel = self.valor_mensal * 12
+        total_12_meses_com_contrato = total_12_meses_aluguel + self.valor_contrato
 
         print("\n" + "-"*100)
         print(" "*30 + "DETALHES DO CONTRATO E FINANCEIRO")
         print("-"*100 + "\n")
         print(f"Valor total do contrato: R$ {self.valor_contrato:.2f}")
-        print(F"Parcelas do contrato: {self.parcelas_contrato} x R$ {self.valor_parcelas_contrato:.2f}")
+        print(f"Parcelas do contrato: {self.parcelas_contrato} x R$ {self.valor_parcelas_contrato:.2f}")
         print(f"Possui crianças: {'SIM' if self.tem_criancas else 'NÃO'}")
         print("\n" + "-"*100)
         print(" "*30 + "PROJEÇÃO DE 12 MESES DE ALUGUEL")
         print("-"*100 + "\n")
-        print(f"Total em 12 meses: R$ {total_12_meses:.2f}")
-        print(f"Média mensal: R$ {self.valor_mensal:.2f}")
+        print(f"Total do aluguel em 12 meses: R$ {total_12_meses_aluguel:.2f}")
+        print(f"Total com contrato incluso: R$ {total_12_meses_com_contrato:.2f} (aluguel + R$ {self.valor_contrato:.2f} do contrato)")
+        print(f"Média mensal (apenas aluguel): R$ {self.valor_mensal:.2f}")
 
 # Gera um arquivo CSV com a projeção de 12 meses.
     def gerar_csv_12_meses(self, nome_arquivo="orcamento_12_meses.csv"):
         try:
-            dados = []
-            for mes in range(1, 13):
-                dados.append({
-                    'Mes': f'Mês {mes}',
-                    'Valor_Aluguel': self.valor_mensal,
-                    'Descricao': f'Aluguel {self.imovel.tipo} - Mês {mes}'
-                })
-
-# Escreve no CSV.
-            with open(nome_arquivo, 'w', newline='', encoding= 'utf-8') as arquivo:
-                campos = ['Mes', 'Valor_Aluguel', 'Descricao']
-                escritor = csv.DictWriter(arquivo, fieldnames=campos)
-                escritor.writeheader()
-                escritor.writerows(dados)
+            with open(nome_arquivo, 'w', newline='', encoding='utf-8') as arquivo:
+                escritor = csv.writer(arquivo)
+                escritor.writerow(["Mês", "Aluguel (R$)", "Parcela do Contrato (R$)", "Total a Pagar (R$)"])
+                
+                for mes in range(1, 13):
+                    parcela = self.valor_parcelas_contrato if mes <= self.parcelas_contrato else 0
+                    total = round(self.valor_mensal + parcela, 2)
+                    escritor.writerow([mes, f"{self.valor_mensal:.2f}", f"{parcela:.2f}", f"{total:.2f}"])
+                    
             print(f"\nArquivo CSV gerado com sucesso: {nome_arquivo}")
             return nome_arquivo
         except Exception as e:
@@ -206,10 +197,10 @@ def criar_orcamento_apartamento():
     print("-"*100 + "\n")
     try:
 # Solicita dados do apartamento.
-        quartos = int(input("Quatidade de quartos: ") or "1")
+        quartos = int(input("Quantidade de quartos: ") or "1")
         garagem = input("Incluir vaga de garagem? (S/N): ").upper() == "S"
         tem_criancas = input("Possui crianças? (S/N): ").upper() == "S"
-# Solicita Parcalamento do contrato.        
+# Solicita Parcelamento do contrato.        
         parcelas = int(input("Número de parcelas para o contrato (1-5, padrão: 1): ") or "1")
         parcelas = min(max(1, parcelas), 5)                                 # Garante entre 1-5
 # Cria objeto do apartamento.
@@ -237,10 +228,10 @@ def criar_orcamento_casa():
     print("-"*100 + "\n")
     try:
 # Solicita dados para casa
-        quartos = int(input("Quatidade de quartos: ") or "1")
+        quartos = int(input("Quantidade de quartos: ") or "1")
         garagem = input("Incluir vaga de garagem? (S/N): ").upper() == "S"
         tem_criancas = input("Possui crianças? (S/N): ").upper() == "S"
-# Solicita Parcalamento do contrato.        
+# Solicita Parcelamento do contrato.        
         parcelas = int(input("Número de parcelas para o contrato (1-5, padrão: 1): ") or "1")
         parcelas = min(max(1, parcelas), 5)                                 # Garante entre 1-5
 # Cria objeto casa
@@ -324,8 +315,8 @@ def exemplos_uso():
 # Função Principal que inicia o sistema.
 def main():
     print("\n" + "-"*100)
-    print(" "*20 + "Bem - vindo ao Sistema de Orçamento da Imobiliária R.M!")
-    print(" "*23 + "Este sistema gera orçamento mensais de aluguel.")
+    print(" "*20 + "Bem-vindo ao Sistema de Orçamento da Imobiliária R.M!")
+    print(" "*23 + "Este sistema gera orçamentos mensais de aluguel.")
     print("-"*100 + "\n")
     while True:
         print("\n" + "*"*100)
@@ -352,4 +343,3 @@ def main():
 # Execução do programa.
 if __name__ == "__main__":
     main()
-    
